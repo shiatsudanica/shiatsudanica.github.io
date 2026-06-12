@@ -1,0 +1,19 @@
+{
+  "name": "Shiatsu Danica Kuštera",
+  "short_name": "Shiatsu Danica",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "theme_color": "#365847",
+  "background_color": "#fbfaf7",
+  "display": "standalone"
+}
