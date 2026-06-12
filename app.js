@@ -145,9 +145,10 @@ async function loadSlots() {
   updateFormState();
   renderCalendarSkeleton();
 
-  const gridStart = startOfCalendarGrid(state.currentMonth);
-  const from = formatDateKey(gridStart);
-  const to = formatDateKey(addDays(gridStart, 41));
+  const monthStart = startOfMonth(state.currentMonth);
+  const monthEnd = endOfMonth(state.currentMonth);
+  const from = formatDateKey(monthStart);
+  const to = formatDateKey(monthEnd);
 
   try {
     const response = await fetch(apiUrl(`/api/slots?from=${from}&to=${to}`), {
@@ -195,31 +196,48 @@ function renderCalendarSkeleton() {
   els.monthLabel.textContent = capitalize(monthFormatter.format(state.currentMonth));
   els.calendarGrid.innerHTML = "";
 
-  for (let index = 0; index < 42; index += 1) {
+  const gridDates = calendarGridDates(state.currentMonth);
+  gridDates.forEach((date) => {
+    if (date.getMonth() !== state.currentMonth.getMonth()) {
+      const blank = document.createElement("div");
+      blank.className = "calendar-day is-blank";
+      blank.setAttribute("aria-hidden", "true");
+      els.calendarGrid.append(blank);
+      return;
+    }
+
     const button = document.createElement("button");
     button.type = "button";
     button.className = "calendar-day is-empty is-loading";
     button.disabled = true;
     button.innerHTML = `<span class="day-number">&nbsp;</span><span class="day-status"></span>`;
     els.calendarGrid.append(button);
-  }
+  });
 }
 
 function renderCalendar() {
   els.monthLabel.textContent = capitalize(monthFormatter.format(state.currentMonth));
   els.calendarGrid.innerHTML = "";
 
-  const gridStart = startOfCalendarGrid(state.currentMonth);
   const todayKey = formatDateKey(new Date());
   const slotsByDate = groupSlotsByDate(state.slots);
+  const gridDates = calendarGridDates(state.currentMonth);
 
-  for (let index = 0; index < 42; index += 1) {
-    const date = addDays(gridStart, index);
+  gridDates.forEach((date) => {
     const dateKey = formatDateKey(date);
+    const outside = date.getMonth() !== state.currentMonth.getMonth();
+
+    if (outside) {
+      const blank = document.createElement("div");
+      blank.className = "calendar-day is-blank";
+      blank.setAttribute("aria-hidden", "true");
+      els.calendarGrid.append(blank);
+      return;
+    }
+
     const daySlots = slotsByDate.get(dateKey) || [];
     const availableCount = daySlots.filter((slot) => slot.status === "available").length;
     const bookedCount = daySlots.filter((slot) => slot.status === "booked").length;
-    const outside = date.getMonth() !== state.currentMonth.getMonth();
     const isSelected = state.selectedDate === dateKey;
     const isEmpty = availableCount === 0 && bookedCount === 0;
     const isAvailable = availableCount > 0;
@@ -260,7 +278,7 @@ function renderCalendar() {
     });
 
     els.calendarGrid.append(button);
-  }
+  });
 }
 
 function renderTimes() {
@@ -397,6 +415,10 @@ function startOfMonth(date) {
   return new Date(date.getFullYear(), date.getMonth(), 1);
 }
 
+function endOfMonth(date) {
+  return new Date(date.getFullYear(), date.getMonth() + 1, 0);
+}
+
 function addMonths(date, amount) {
   return new Date(date.getFullYear(), date.getMonth() + amount, 1);
 }
@@ -411,6 +433,22 @@ function startOfCalendarGrid(monthDate) {
   const first = startOfMonth(monthDate);
   const mondayBasedIndex = (first.getDay() + 6) % 7;
   return addDays(first, -mondayBasedIndex);
+}
+
+function endOfCalendarGrid(monthDate) {
+  const last = endOfMonth(monthDate);
+  const mondayBasedIndex = (last.getDay() + 6) % 7;
+  return addDays(last, 6 - mondayBasedIndex);
+}
+
+function calendarGridDates(monthDate) {
+  const dates = [];
+  const start = startOfCalendarGrid(monthDate);
+  const end = endOfCalendarGrid(monthDate);
+  for (let date = start; date <= end; date = addDays(date, 1)) {
+    dates.push(date);
+  }
+  return dates;
 }
 
 function formatDateKey(date) {

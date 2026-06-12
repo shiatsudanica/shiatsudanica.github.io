@@ -733,6 +733,16 @@ h3 {
   border-color: rgba(31, 39, 35, 0.1);
 }
 
+.calendar-day.is-blank {
+  min-height: 76px;
+  padding: 0;
+  border-color: transparent;
+  background: transparent;
+  box-shadow: none;
+  cursor: default;
+  pointer-events: none;
+}
+
 .calendar-day.has-available {
   color: #183326;
   background: #e8f4eb;
