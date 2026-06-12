@@ -364,7 +364,7 @@ async function submitBooking(event) {
     const emailMessage = data.emailSent
       ? " Potvrzení bylo odesláno na zadaný e-mail."
       : data.emailConfigured
-        ? " Rezervace je uložená, ale potvrzovací e-mail se nepodařilo odeslat. Pro jistotu si termín poznamenejte."
+        ? ` Rezervace je uložená, ale potvrzovací e-mail se nepodařilo odeslat. ${data.emailError ? `Důvod: ${data.emailError}` : "Pro jistotu si termín poznamenejte."}`
         : " Rezervace je uložená, ale e-mailové potvrzení zatím není nastavené.";
     setFormStatus(`Rezervace je potvrzená.${emailMessage}`, "success");
     els.form.reset();
