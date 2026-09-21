@@ -1,0 +1,10 @@
+/* Vzhled pro index.html s novými fotografiemi ve vysokém rozlišení. */
+@import url("styles.css?v=6");
+
+.hero-media {
+  background-image: url("images/shiatsu-hero-seated-enhanced.png");
+}
+
+.story-image-left {
+  background-image: url("images/shiatsu-story-wide-enhanced.png");
+}
